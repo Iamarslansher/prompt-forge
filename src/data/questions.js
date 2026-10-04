@@ -1,4 +1,7 @@
-export const QUESTIONS_DATA = {
+import { ADVANCED_QUESTION_DATA } from './advancedQuestions.js';
+import { improveDistractors } from '../utils/questionQuality.js';
+
+const BASE_QUESTIONS_DATA = {
   1: [
     {
       id: "q1_1",
@@ -806,3 +809,17 @@ export const QUESTIONS_DATA = {
     }
   ]
 };
+
+export const QUESTIONS_DATA = Object.fromEntries(
+  Object.entries(BASE_QUESTIONS_DATA).map(([chapterId, baseQuestions]) => {
+    const questions = [...baseQuestions, ...(ADVANCED_QUESTION_DATA[chapterId] || [])];
+    return [
+      chapterId,
+      questions.map((question, index) => improveDistractors({
+          ...question,
+          id: question.id || `q${chapterId}_${index + 1}`,
+          difficulty: index >= Math.floor(questions.length * 0.7) ? 'Hard' : index >= Math.floor(questions.length * 0.4) ? 'Challenging' : 'Medium'
+        }))
+    ];
+  })
+);

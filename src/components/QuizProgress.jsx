@@ -1,8 +1,10 @@
 import React from 'react';
 import { HelpCircle, Clock } from 'lucide-react';
 
-export default function QuizProgress({ currentQuestion, totalQuestions, chapterTitle }) {
+export default function QuizProgress({ currentQuestion, totalQuestions, chapterTitle, timeRemaining }) {
   const percent = Math.round(((currentQuestion + 1) / totalQuestions) * 100);
+  const minutes = Math.floor(timeRemaining / 60).toString().padStart(2, '0');
+  const seconds = (timeRemaining % 60).toString().padStart(2, '0');
 
   return (
     <div className="space-y-3 mb-6">
@@ -14,6 +16,9 @@ export default function QuizProgress({ currentQuestion, totalQuestions, chapterT
         <div className="text-right">
           <span className="font-heading font-bold text-blue-300 text-sm">{currentQuestion + 1} / {totalQuestions}</span>
           <span className="text-[10px] text-slate-400 block font-medium">{percent}% Completed</span>
+          <span className={`text-[10px] font-semibold flex items-center justify-end gap-1 mt-1 ${timeRemaining <= 300 ? 'text-amber-300' : 'text-slate-400'}`}>
+            <Clock className="w-3 h-3" /> {minutes}:{seconds} remaining
+          </span>
         </div>
       </div>
 

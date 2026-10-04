@@ -3,7 +3,7 @@ import { Link, useNavigate } from 'react-router-dom';
 import confetti from 'canvas-confetti';
 import { CheckCircle2, XCircle, RotateCcw, ArrowRight, BookOpen, ChevronDown, ChevronUp, AlertCircle, Award } from 'lucide-react';
 
-export default function QuizResultCard({ chapter, score, correctCount, totalQuestions, passed, questions, userAnswers, onRetry }) {
+export default function QuizResultCard({ chapter, score, correctCount, partialCount, totalQuestions, passed, timedOut, questions, userAnswers, answerResults, onRetry }) {
   const [showReview, setShowReview] = useState(false);
   const navigate = useNavigate();
 
@@ -35,6 +35,9 @@ export default function QuizResultCard({ chapter, score, correctCount, totalQues
 
         <p className="text-xs font-bold uppercase tracking-widest text-slate-400 mb-1">QUIZ COMPLETE</p>
         <h2 className="font-heading font-black text-3xl text-white mb-2">{chapter.title}</h2>
+        {timedOut && (
+          <p className="text-xs text-amber-300 mb-2">Time expired; unanswered questions were marked incorrect.</p>
+        )}
 
         {/* Score Pill */}
         <div className="my-6 py-4 px-6 rounded-2xl bg-white/5 border border-white/10 inline-block">
@@ -43,7 +46,7 @@ export default function QuizResultCard({ chapter, score, correctCount, totalQues
             {score}%
           </div>
           <div className="text-xs font-medium text-slate-300 mt-1">
-            {correctCount} / {totalQuestions} Correct
+            {correctCount} correct{partialCount ? `, ${partialCount} partial` : ''} / {totalQuestions}
           </div>
         </div>
 
@@ -120,21 +123,23 @@ export default function QuizResultCard({ chapter, score, correctCount, totalQues
           <div className="mt-4 pt-4 border-t border-white/10 space-y-4">
             {questions.map((q, idx) => {
               const userAns = userAnswers[idx];
-              const isCorrect = userAns === q.correctAnswer;
+              const answerResult = answerResults?.[idx];
+              const isCorrect = q.type === 'text' ? answerResult?.score === 1 : userAns === q.correctAnswer;
+              const isPartial = q.type === 'text' && answerResult?.score === 0.5;
 
               return (
                 <div
                   key={idx}
                   className={`p-4 rounded-2xl border text-left space-y-2 ${
-                    isCorrect ? "bg-emerald-950/20 border-emerald-500/30" : "bg-red-950/20 border-red-500/30"
+                    isCorrect ? "bg-emerald-950/20 border-emerald-500/30" : isPartial ? "bg-amber-950/20 border-amber-500/30" : "bg-red-950/20 border-red-500/30"
                   }`}
                 >
                   <div className="flex items-center justify-between text-xs font-semibold">
                     <span className="text-slate-400">Q{idx + 1}.</span>
                     <span className={`px-2 py-0.5 rounded text-[10px] uppercase tracking-wider ${
-                      isCorrect ? "bg-emerald-500/20 text-emerald-300" : "bg-red-500/20 text-red-300"
+                      isCorrect ? "bg-emerald-500/20 text-emerald-300" : isPartial ? "bg-amber-500/20 text-amber-300" : "bg-red-500/20 text-red-300"
                     }`}>
-                      {isCorrect ? "Correct" : "Incorrect"}
+                      {isCorrect ? "Correct" : isPartial ? "Partially correct" : "Needs improvement"}
                     </span>
                   </div>
 
@@ -142,14 +147,36 @@ export default function QuizResultCard({ chapter, score, correctCount, totalQues
 
                   <div className="text-xs space-y-1">
                     <p className="text-slate-300">
-                      Your Answer: <strong className={isCorrect ? "text-emerald-300" : "text-red-300"}>
-                        {userAns !== undefined ? q.options[userAns] : "Not answered"}
+                      Your Answer:                       <strong className={isCorrect ? "text-emerald-300" : isPartial ? "text-amber-300" : "text-red-300"}>
+                        {userAns !== undefined
+                          ? q.type === 'text' ? userAns : q.options[userAns]
+                          : "Not answered"}
                       </strong>
                     </p>
-                    {!isCorrect && (
+                    {q.type !== 'text' && !isCorrect && (
                       <p className="text-emerald-400 font-medium">
                         Correct Answer: {q.options[q.correctAnswer]}
                       </p>
+                    )}
+                    {q.type === 'text' && (
+                      <>
+                        <p className="text-emerald-300 font-medium whitespace-pre-line">
+                          Model answer: {q.sampleAnswer}
+                        </p>
+                        <p className={isCorrect ? "text-emerald-300" : isPartial ? "text-amber-300" : "text-red-300"}>
+                          {answerResult?.feedback || 'No answer was provided.'}
+                          {answerResult?.totalConcepts > 0
+                            ? ` Covered ${answerResult.matchedCount} of ${answerResult.totalConcepts} key criteria.`
+                            : ''}
+                        </p>
+                        {q.rubric?.length > 0 && answerResult && (
+                          <p className="text-slate-400">
+                            {answerResult.missingConcepts.length
+                              ? `Criteria not detected: ${answerResult.missingConcepts.map((criterion) => criterion.split('|')[0]).join(', ')}.`
+                              : 'All key criteria were detected.'}
+                          </p>
+                        )}
+                      </>
                     )}
                   </div>
 

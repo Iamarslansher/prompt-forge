@@ -91,7 +91,7 @@ export function ProgressProvider({ children }) {
     }
   };
 
-  const recordQuizResult = (chapterId, score, correctCount, totalQuestions, answers) => {
+  const recordQuizResult = (chapterId, score, correctCount, totalQuestions, answers, partialCount = 0) => {
     if (!user?.username || !progress) return;
 
     const chapterNum = Number(chapterId);
@@ -104,6 +104,7 @@ export function ProgressProvider({ children }) {
       score,
       correctCount,
       totalQuestions,
+      partialCount,
       passed,
       answers
     });

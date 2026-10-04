@@ -230,7 +230,9 @@ export default function ProfilePage() {
                   <span className={`font-bold ${att.passed ? "text-emerald-400" : "text-red-400"}`}>
                     {att.score}%
                   </span>
-                  <span className="text-[10px] text-slate-400 block">{att.correctCount} / {att.totalQuestions} Correct</span>
+                  <span className="text-[10px] text-slate-400 block">
+                    {att.correctCount} correct{att.partialCount ? `, ${att.partialCount} partial` : ''} / {att.totalQuestions}
+                  </span>
                 </div>
               </div>
             ))}
