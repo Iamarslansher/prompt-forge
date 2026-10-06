@@ -143,17 +143,32 @@ export default function Footer() {
             Follow Us
           </h4>
           <div className="space-y-2 text-xs text-slate-400">
-            <p className="flex items-center gap-1.5">
+            <Link
+              to="https://www.linkedin.com/in/arsalan-sher-0bb9b32a8/?isSelfProfile=true"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="flex items-center gap-1.5"
+            >
               <FaLinkedin className="w-3.5 h-3.5 text-blue-400" />
-              linkedin
-            </p>
-            <p className="flex items-center gap-1.5">
-              <FaSquareTwitter className="w-3.5 h-3.5 text-purple-400" />{" "}
+              LinkedIn
+            </Link>
+            <Link
+              to="https://twitter.com/promptforge"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="flex items-center gap-1.5"
+            >
+              <FaSquareTwitter className="w-3.5 h-3.5 text-purple-400" />
               Twitter
-            </p>
-            <p className="flex items-center gap-1.5">
+            </Link>
+            <Link
+              to="https://github.com/Iamarslansher/prompt-forge"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="flex items-center gap-1.5"
+            >
               <FaGithubSquare className="w-3.5 h-3.5 text-gray-400" /> GitHub
-            </p>
+            </Link>
             <p className="mt-4 text-[11px] text-slate-500">
               © 2026 PromptForge. Developed by Arslan Sher.
             </p>
